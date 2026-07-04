@@ -6,7 +6,7 @@ from pathlib import Path
 # PAGE CONFIG
 # -------------------------------
 st.set_page_config(
-    page_title="Code With Me",
+    page_title="Study With Me",
     page_icon="📚",
     layout="wide"
 )
@@ -23,7 +23,7 @@ subjects = [pdf.stem for pdf in pdf_files]
 # -------------------------------
 # SIDEBAR
 # -------------------------------
-st.sidebar.title("📚 Code With Me")
+st.sidebar.title("📚 Study With Me")
 
 page = st.sidebar.radio(
     "Navigation",
@@ -44,7 +44,7 @@ st.sidebar.success("Welcome!")
 
 if page == "🏠 Home":
 
-    st.title("📚 Code With Me")
+    st.title("📚 Study With Me")
 
     st.write("### One Place for Notes, Videos & Exam Preparation")
 
