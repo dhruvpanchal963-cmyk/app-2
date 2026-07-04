@@ -23,7 +23,7 @@ subjects = [pdf.stem for pdf in pdf_files]
 # -------------------------------
 # SIDEBAR
 # -------------------------------
-st.sidebar.title("📚 Study ShareStream")
+st.sidebar.title("📚 Code With Me")
 
 page = st.sidebar.radio(
     "Navigation",
@@ -44,7 +44,7 @@ st.sidebar.success("Welcome!")
 
 if page == "🏠 Home":
 
-    st.title("📚 Study ShareStream")
+    st.title("📚 Code With Me")
 
     st.write("### One Place for Notes, Videos & Exam Preparation")
 
