@@ -1,16 +1,28 @@
 import streamlit as st
 import pandas as pd
 from pathlib import Path
-import os
 
+# -------------------------------
+# PAGE CONFIG
+# -------------------------------
 st.set_page_config(
     page_title="Study ShareStream",
     page_icon="📚",
     layout="wide"
 )
 
+# -------------------------------
+# PATHS
+# -------------------------------
 BASE_DIR = Path(__file__).parent
 
+# Read all PDFs from current folder
+pdf_files = sorted(BASE_DIR.glob("*.pdf"))
+subjects = [pdf.stem for pdf in pdf_files]
+
+# -------------------------------
+# SIDEBAR
+# -------------------------------
 st.sidebar.title("📚 Study ShareStream")
 
 page = st.sidebar.radio(
@@ -26,14 +38,15 @@ page = st.sidebar.radio(
 st.sidebar.markdown("---")
 st.sidebar.success("Welcome!")
 
-pdf_files = sorted(BASE_DIR.glob("*.pdf"))
-subjects = [pdf.stem for pdf in pdf_files]
+# =====================================================
+# HOME PAGE
+# =====================================================
 
 if page == "🏠 Home":
 
     st.title("📚 Study ShareStream")
 
-    st.write("### Learn Smarter with Notes & Video Lectures")
+    st.write("### One Place for Notes, Videos & Exam Preparation")
 
     col1, col2, col3 = st.columns(3)
 
@@ -43,7 +56,14 @@ if page == "🏠 Home":
 
     st.divider()
 
-    choice = st.selectbox("📘 Select Subject", subjects)
+    if len(subjects) == 0:
+        st.error("No PDF files found.")
+        st.stop()
+
+    choice = st.selectbox(
+        "📘 Select Subject",
+        subjects
+    )
 
     pdf_path = BASE_DIR / f"{choice}.pdf"
 
@@ -54,122 +74,96 @@ if page == "🏠 Home":
             st.download_button(
                 "📥 Download Notes",
                 pdf,
-                file_name=f"{choice}.pdf",
+                file_name=pdf_path.name,
                 mime="application/pdf"
             )
 
     explanations = {
 
         "Python": """
-Python is a simple programming language.
+Python is an easy programming language.
 
-• Easy to Learn
-
-• Web Development
-
-• AI & Machine Learning
-
-• Data Analysis
+Topics:
+• Variables
+• Loops
+• Functions
+• OOP
+• File Handling
 """,
 
         "BDMS": """
-Database Management System
+DBMS stands for Database Management System.
 
-• MySQL
-
-• Oracle
-
+Topics:
+• Database
+• ER Diagram
 • SQL
-
-• PostgreSQL
+• Normalization
 """,
 
         "Big data": """
-Big Data refers to huge amounts of data.
+Big Data means extremely large datasets.
 
 5 V's
 
 • Volume
-
 • Velocity
-
 • Variety
-
 • Veracity
-
 • Value
 """
     }
 
     st.subheader("📖 Easy Explanation")
 
-    st.write(explanations.get(choice, "Explanation Coming Soon."))
+    st.write(
+        explanations.get(
+            choice,
+            "Explanation Coming Soon."
+        )
+    )
 
     st.subheader("📝 Exam Tips")
 
     st.markdown("""
 - ✔ Read definitions
 - ✔ Practice diagrams
+- ✔ Solve previous year papers
 - ✔ Revise regularly
-- ✔ Solve Previous Papers
 """)
-    if page == "🎥 Video Lectures":
+    # =====================================================
+# STUDY MATERIAL PAGE
+# =====================================================
 
-    st.title("🎥 Video Lectures")
+elif page == "📄 Study Material":
 
-    video_file = BASE_DIR / "video.csv"
+    st.title("📄 Study Materials")
 
-    if video_file.exists():
+    if len(pdf_files) == 0:
 
-        video_df = pd.read_csv(video_file)
-
-        video_df.columns = video_df.columns.str.strip()
-
-        st.write("Available Subjects:")
-        st.write(video_df["Subject"])
-
-        subject = st.selectbox(
-            "Choose Subject",
-            video_df["Subject"]
-        )
-
-        row = video_df[video_df["Subject"] == subject]
-
-        if not row.empty:
-
-            st.video(row.iloc[0]["Video"])
-
-        else:
-
-            st.warning("No Video Found.")
+        st.warning("No PDF files found.")
 
     else:
 
-        st.error("video.csv not found.")
+        for pdf in pdf_files:
 
+            with st.expander(f"📄 {pdf.stem}"):
 
+                st.write(f"**File Name:** {pdf.name}")
 
+                size = pdf.stat().st_size / 1024
 
-if page == "📄 Study Material":
+                st.write(f"**File Size:** {size:.2f} KB")
 
-    st.title("📄 Study Material")
+                with open(pdf, "rb") as f:
 
-    for pdf in pdf_files:
-
-        with st.expander(pdf.name):
-
-            st.write(f"Subject : {pdf.stem}")
-
-            with open(pdf, "rb") as f:
-
-                st.download_button(
-                    "📥 Download PDF",
-                    f,
-                    file_name=pdf.name,
-                    mime="application/pdf"
-                )
-
-
+                    st.download_button(
+                        label=f"📥 Download {pdf.stem}",
+                        data=f,
+                        file_name=pdf.name,
+                        mime="application/pdf",
+                        key=pdf.stem
+                    )
 
     st.divider()
 
@@ -179,70 +173,124 @@ if page == "📄 Study Material":
 
     if search:
 
-        result = [s for s in subjects if search.lower() in s.lower()]
+        result = [
+            s for s in subjects
+            if search.lower() in s.lower()
+        ]
 
         if result:
 
-            st.success(result)
+            st.success("Available Subjects")
+
+            for subject in result:
+                st.write(f"✅ {subject}")
 
         else:
 
             st.error("No Subject Found")
-            if page == "👨‍💻 About":
+            # =====================================================
+# VIDEO LECTURES PAGE
+# =====================================================
 
-    st.title("👨‍💻 About")
+elif page == "🎥 Video Lectures":
 
-    st.markdown("""
-## 📚 Study ShareStream
+    st.title("🎥 Video Lectures")
 
-Study ShareStream is a free learning platform developed using Python and Streamlit.
+    video_file = BASE_DIR / "video.csv"
 
-### 🚀 Features
+    if video_file.exists():
 
-✅ Download Study Notes
+        try:
 
-✅ Watch Video Lectures
+            video_df = pd.read_csv(video_file)
 
-✅ Search Subjects
+            # Remove extra spaces from column names
+            video_df.columns = video_df.columns.str.strip()
 
-✅ Clean & Responsive UI
+            # Check required columns
+            if "Subject" not in video_df.columns or "Video" not in video_df.columns:
+                st.error("video.csv must contain 'Subject' and 'Video' columns.")
+                st.stop()
 
-### 📚 Subjects
+            # Remove spaces from subject names
+            video_df["Subject"] = video_df["Subject"].astype(str).str.strip()
 
-- Python
+            st.subheader("Select a Subject")
 
-- BDMS
+            subject = st.selectbox(
+                "📘 Subject",
+                video_df["Subject"].tolist()
+            )
 
-- Big data
+            row = video_df[video_df["Subject"] == subject]
 
-### 🛠 Technologies
+            if not row.empty:
 
-- Python
+                st.success(f"Now Playing: {subject}")
 
-- Streamlit
+                st.video(row.iloc[0]["Video"])
 
-- Pandas
+            else:
 
-### 👨‍💻 Developer
+                st.warning("No video available for this subject.")
 
-Dhruv Panchal
+        except Exception as e:
 
-### 🎯 Purpose
+            st.error(f"Error reading video.csv: {e}")
 
-To help students learn quickly with notes and videos.
-""")
+    else:
 
-st.divider()
+        st.error("video.csv not found in the project folder.")
+        # =====================================================
+# VIDEO LECTURES PAGE
+# =====================================================
 
-st.markdown(
-"""
-<center>
+elif page == "🎥 Video Lectures":
 
-Made with ❤️ by <b>Dhruv Panchal</b>
+    st.title("🎥 Video Lectures")
 
-© 2026 Study ShareStream
+    video_file = BASE_DIR / "video.csv"
 
-</center>
-""",
-unsafe_allow_html=True
-)
+    if video_file.exists():
+
+        try:
+
+            video_df = pd.read_csv(video_file)
+
+            # Remove extra spaces from column names
+            video_df.columns = video_df.columns.str.strip()
+
+            # Check required columns
+            if "Subject" not in video_df.columns or "Video" not in video_df.columns:
+                st.error("video.csv must contain 'Subject' and 'Video' columns.")
+                st.stop()
+
+            # Remove spaces from subject names
+            video_df["Subject"] = video_df["Subject"].astype(str).str.strip()
+
+            st.subheader("Select a Subject")
+
+            subject = st.selectbox(
+                "📘 Subject",
+                video_df["Subject"].tolist()
+            )
+
+            row = video_df[video_df["Subject"] == subject]
+
+            if not row.empty:
+
+                st.success(f"Now Playing: {subject}")
+
+                st.video(row.iloc[0]["Video"])
+
+            else:
+
+                st.warning("No video available for this subject.")
+
+        except Exception as e:
+
+            st.error(f"Error reading video.csv: {e}")
+
+    else:
+
+        st.error("video.csv not found in the project folder.")
