@@ -6,7 +6,7 @@ from pathlib import Path
 # PAGE CONFIG
 # -------------------------------
 st.set_page_config(
-    page_title="Study ShareStream",
+    page_title="Code With Me",
     page_icon="📚",
     layout="wide"
 )
