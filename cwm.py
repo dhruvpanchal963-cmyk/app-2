@@ -192,10 +192,6 @@ elif page == "📄 Study Material":
 # VIDEO LECTURES PAGE
 # =====================================================
 
-elif page == "🎥 Video Lectures":
-
-    st.title("🎥 Video Lectures")
-
     video_file = BASE_DIR / "video.csv"
 
     if video_file.exists():
@@ -292,5 +288,78 @@ elif page == "🎥 Video Lectures":
             st.error(f"Error reading video.csv: {e}")
 
     else:
-
+        
         st.error("video.csv not found in the project folder.")
+        # =====================================================
+# ABOUT PAGE
+# =====================================================
+
+elif page == "👨‍💻 About":
+
+    st.title("👨‍💻 About Study ShareStream")
+
+    st.markdown("""
+# 📚 Study ShareStream
+
+Study ShareStream is an educational platform developed using **Python** and **Streamlit**.
+
+## 🚀 Features
+
+✅ Download Study PDFs
+
+✅ Watch Video Lectures
+
+✅ Search Subjects
+
+✅ Clean User Interface
+
+---
+
+## 📚 Subjects
+
+- 🐍 Python
+- 💾 BDMS
+- 📊 Big Data
+
+---
+
+## 🛠 Technologies Used
+
+- Python
+- Streamlit
+- Pandas
+
+---
+
+## 👨‍💻 Developed By
+
+**Dhruv Panchal**
+
+---
+
+## 🎯 Purpose
+
+To help students access notes and videos from one place.
+""")
+
+    st.divider()
+
+    st.subheader("📞 Contact")
+
+    st.write("📧 Email : dhruvpanchal963@gmail.com")
+
+    st.write("💻 GitHub : https://github.com/")
+
+    st.write("🔗 LinkedIn : https://linkedin.com/")
+st.divider()
+
+st.markdown(
+    """
+    <div style="text-align:center;">
+        <h3>📚 Study ShareStream</h3>
+        <p>Made with ❤️ using Streamlit</p>
+        <p><b>Developed by Dhruv Panchal</b></p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
